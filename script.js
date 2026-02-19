@@ -6,7 +6,11 @@ canvas.height = window.innerHeight;
 
 const frameCount = 240;
 const images = [];
+const imageSeq = {
+    frame: 0
+};
 
+// Generate image path with 3-digit format (001, 002, ...)
 function currentFrame(index) {
     const number = String(index + 1).padStart(3, '0');
     return `frames/ezgif-frame-${number}.jpg`;
@@ -19,10 +23,8 @@ for (let i = 0; i < frameCount; i++) {
     images.push(img);
 }
 
-function render(index) {
-    const img = images[index];
-    if (!img.complete) return;
-
+// Draw image on canvas
+function drawImage(img) {
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     const scale = Math.max(
@@ -43,9 +45,13 @@ function render(index) {
 }
 
 // Initial render
-images[0].onload = () => render(0);
+images[0].onload = () => {
+    drawImage(images[0]);
+};
 
+// Scroll animation
 window.addEventListener("scroll", () => {
+
     const scrollTop = window.scrollY;
     const maxScroll = document.body.scrollHeight - window.innerHeight;
     const scrollFraction = scrollTop / maxScroll;
@@ -55,7 +61,9 @@ window.addEventListener("scroll", () => {
         Math.floor(scrollFraction * frameCount)
     );
 
-    requestAnimationFrame(() => render(frameIndex));
+    requestAnimationFrame(() => {
+        drawImage(images[frameIndex]);
+    });
 });
 
 // Responsive resize
@@ -63,3 +71,4 @@ window.addEventListener("resize", () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 });
+
